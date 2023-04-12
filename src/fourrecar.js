@@ -1,11 +1,27 @@
-let newUrl = document.location.href;
-if (!document.location.href.includes('&sort=')) {
-    newUrl += '&sort=facet_price';
-}
-if (!document.location.href.includes('s?filters[Facet_vendeurs][0]')) {
-    newUrl = newUrl.replace(/s\?.*?&/, 's?filters[Facet_vendeurs][0]=Carrefour&');
+function newURL(url) {
+    let newUrl = url;
+    if (!newUrl.includes('&sort=')) {
+        newUrl += '&sort=productSimpleView.pricePerUnitCents';
+    }
+    if (!newUrl.includes('s?filters[Facet_vendeurs][0]')) {
+        newUrl = newUrl.replace("s?", 's?filters[Facet_vendeurs][0]=Carrefour&');
+    }
+    return newUrl;
 }
 
-if (document.location.href !== newUrl) {
-    document.location = newUrl;
+function redirect(requestDetails) {
+    const targetUrl = newURL(requestDetails.url);
+    if (requestDetails.url === targetUrl) {
+        return;
+    }
+    console.log(`Redirecting: ${requestDetails.url}\nto ${targetUrl}`);
+    return {
+        redirectUrl: targetUrl
+    };
 }
+
+browser.webRequest.onBeforeRequest.addListener(
+    redirect,
+    { urls: ["*://*.carrefour.fr/s?*"] },
+    ["blocking"]
+);

@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "FourreCar",
   "version": "0.1.0",
   "description": "Facilite la commande de courses Carrefour",
@@ -7,17 +7,15 @@
     "48": "icons/FourreCar-48.png",
     "96": "icons/FourreCar-96.png"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*.carrefour.fr/s?*"
-      ],
-      "js": [
-        "fourrecar.js"
-      ]
-    }
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "*://*.carrefour.fr/s?*"
   ],
-  "action": {
+  "background": {
+    "scripts": ["fourrecar.js"]
+  },
+  "browser_action": {
     "default_icon": "icons/FourreCar-32.png",
     "default_title": "FourreCar"
   },
@@ -26,8 +24,5 @@
       "id": "fourrecar.kek@gmail.com",
       "strict_min_version": "42.0"
     }
-  },
-  "host_permissions": [
-    "*://*.carrefour.fr/s?*"
-  ]
+  }
 }
