@@ -1,9 +1,13 @@
 function newURL(url) {
     let newUrl = url;
-    if (!newUrl.includes('&sort=')) {
-        newUrl += '&sort=productSimpleView.pricePerUnitCents';
+    if (!newUrl.includes('sort=')) {
+        if (newUrl.includes("?")) {
+            newUrl += '&sort=productSimpleView.pricePerUnitCents';
+        } else {
+            newUrl += '?sort=productSimpleView.pricePerUnitCents';
+        }
     }
-    if (!newUrl.includes('s?filters[Facet_vendeurs][0]')) {
+    if (newUrl.includes("/s?") && !newUrl.includes('s?filters[Facet_vendeurs][0]')) {
         newUrl = newUrl.replace("s?", 's?filters[Facet_vendeurs][0]=Carrefour&');
     }
     return newUrl;
@@ -22,6 +26,9 @@ function redirect(requestDetails) {
 
 browser.webRequest.onBeforeRequest.addListener(
     redirect,
-    { urls: ["*://*.carrefour.fr/s?*"] },
+    { urls: [
+        "https://www.carrefour.fr/s*", 
+        "https://www.carrefour.fr/r*"
+    ] },
     ["blocking"]
 );
