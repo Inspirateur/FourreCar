@@ -1,16 +1,38 @@
+function parseArg(arg) {
+    let i = arg.indexOf("=");
+    if (i === -1) {
+        return [arg, ""];
+    }
+    return [arg.slice(0, i), arg.slice(i+1)]
+}
+
+function addArgIfNotPresent(params, arg) {
+    let [name, value] = parseArg(arg);
+    if (!params.has(name)) {
+        params.set(name, value)
+    }
+}
+
+function isSearch(urlObj) {
+    return urlObj.pathname.endsWith("/s");
+}
+
+function isCategory(urlObj) {
+    return urlObj.pathname.startsWith("/r/");
+}
+
 function newURL(url) {
-    let newUrl = url;
-    if (!newUrl.includes('sort=')) {
-        if (newUrl.includes("?")) {
-            newUrl += '&sort=productSimpleView.pricePerUnitCents';
-        } else {
-            newUrl += '?sort=productSimpleView.pricePerUnitCents';
-        }
+    const urlObj = new URL(url);
+    if (!isSearch(urlObj) && !isCategory(urlObj)) {
+        return url;
     }
-    if (newUrl.includes("/s?") && !newUrl.includes('s?filters[Facet_vendeurs][0]')) {
-        newUrl = newUrl.replace("s?", 's?filters[Facet_vendeurs][0]=Carrefour&');
+    if (isSearch(urlObj)) {
+        addArgIfNotPresent(urlObj.searchParams, "filters[Facet_vendeurs][0]=Carrefour");
+    } else {
+        addArgIfNotPresent(urlObj.searchParams, "filters[facet_enseignes][0]=Drive ou livraison à domicile");
     }
-    return newUrl;
+    addArgIfNotPresent(urlObj.searchParams, "sort=productSimpleView.pricePerUnitCents");
+    return urlObj.href;
 }
 
 function redirect(requestDetails) {
